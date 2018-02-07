@@ -1,0 +1,31 @@
+Problem Formalization
+
+
+Initial State: 
+	Defined in code. ie: 187932456*
+	
+States:
+	9!
+
+Actions:
+	Top, Bottom, Left, Right
+	These actions switch the Up, Bottom,... block with the empty * space
+	
+Transition Model:
+	Array is indexed starting at zero and increases similarly as the lab handout
+	index of * is E
+		Top: swap [E,E-3] 
+		Bottom: swap [E,E+3]
+		Left: swap [E,E-1]
+		Right: swap [E,E+1]
+	
+	assuming [A,B] where A,B < 8
+	
+Goal:
+	*12345678
+	
+Goal Test:
+	If state s = G
+	
+Path Cost:
+	Each step costs 1
