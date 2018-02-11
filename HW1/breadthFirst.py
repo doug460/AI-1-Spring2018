@@ -1,14 +1,21 @@
 '''
 Created on Feb 6, 2018
 
+This is the breadth first search program for AI 1
+
+The first two arguments are the main parts of this program
+the goal and the initial state
+
 @author: dabrown
 '''
 
 import numpy as np
+from inputs import goal, initialState
 
 
-# This is the initial goal of the program
-goal = np.array(['*','1','2','3','4','5','6','7','8'])
+# number of nodes expanded
+expanded = 0
+
 
 # this function turns the character array into an easily printed string
 # input:
@@ -34,26 +41,137 @@ def getString(array):
 def testGoal(array):
     return np.array_equal(array,goal)
 
+# test history
+# if node exists in history, return true
+# else false
+# input:
+#    node
+#    history
+# output
+# boolean
+def testHistory(node, history):
+    for array in history:
+        if(np.array_equal(node,array)):
+            return(True)
+    
+    return(False)
+
+
+# expand a node excluding previous states
+# input:
+#     node array
+#     frontier list
+#     history of expanded nodes list
+# output:
+#    updated frontier
+#    updated history
+def expandNode(node, frontier, history):
+    # get index of where the blank space is at
+    index = np.where(node=='*')[0][0]
+    
+    # holds the node to be added to the list
+    
+    
+    # check above empty
+    if(index - 3 >= 0):
+        # switch positions
+        nextNode = np.copy(node)
+        nextNode[index] = node[index - 3]
+        nextNode[index - 3] = '*'
+        
+        # add to frontier if not already explored
+        if(not testHistory(nextNode, history)):
+            frontier.append(nextNode)
+            history.append(nextNode)
+            print('added:  ', getString(nextNode))
+        
+    # check below empty
+    if(index + 3 <= 8):
+        # switch positions
+        nextNode = np.copy(node)
+        nextNode[index] = node[index + 3]
+        nextNode[index + 3] = '*'
+        
+        # add to frontier if not already explored
+        if(not testHistory(nextNode, history)):
+            frontier.append(nextNode)
+            history.append(nextNode)
+            print('added:  ', getString(nextNode))
+    
+    # check left empty
+    if(index != 0 and index != 3 and index != 6):
+        # switch positions
+        nextNode = np.copy(node)
+        nextNode[index] = node[index - 1]
+        nextNode[index - 1] = '*'
+        
+        # add to frontier if not already explored
+        if(not testHistory(nextNode, history)):
+            frontier.append(nextNode)
+            history.append(nextNode)
+            print('added:  ', getString(nextNode))
+    
+    # check right empty
+    if(index != 2 and index != 5 and index != 8):
+        # switch positions
+        nextNode = np.copy(node)
+        nextNode[index] = node[index + 1]
+        nextNode[index + 1] = '*'
+        
+        # add to frontier if not already explored
+        if(not testHistory(nextNode, history)):
+            frontier.append(nextNode)
+            history.append(nextNode)
+            print('added:  ', getString(nextNode))
+            
+    return(frontier, history)
+    
+    
+    
+
 if __name__ == '__main__':
     pass
 
+    print('BREADTH FIRST SEARCH')
     
-    print('Goal: ', getString(goal))
+    print('Goal:   ', getString(goal))
     
-    # This generates an initial random state for the program
     # state is the state that will be acted upon
-    initialState = np.copy(goal)
-    np.random.shuffle(initialState)
     state = np.copy(initialState)
     
-    print('Initial State: ', getString(initialState))
+    print('Init:   ', getString(initialState))
     
     
     # create a list of nodes with the initial node as the first element
     frontier = []
     frontier.append(state)
+    print('added:  ', getString(state))
     
+    # history of nodes that have been in frontier
+    history = []
     
+    # loop through the frontier
+    while(frontier):
+        # pop out first node
+        node = frontier.pop(0)
+        expanded += 1
+        
+        print('popped: ', getString(node))
+        
+        # add node to history
+        history.append(node)
+        
+        # test if success
+        if(testGoal(node)):
+            print('Reached successful node!')
+            break;
+        
+        # expand node 
+        frontier, history = expandNode(node, frontier, history)
+    
+    # print info
+    print('Number of nodes in fringe: ', len(frontier))
+    print('Number of nodes expanded: ', expanded)
     
     
     
