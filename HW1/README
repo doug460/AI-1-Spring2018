@@ -10,6 +10,7 @@ assuming python 2.7
 All files need to be in same folder
 
 Update the inputs.py file to change the inputs to the search algorithms
+	pico inputs.py
 
 All search algorithms use the same intputs.py file
 
@@ -60,7 +61,7 @@ Output:
 Based on only the misplaced tiles heuristic
 
 ----------- A* 2------------
-based on only the manhattan distance heuristic
+based on only the Manhattan distance heuristic
 
 
 

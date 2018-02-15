@@ -2,6 +2,8 @@
 Created on Feb 6, 2018
 
 @author: dabrown
+
+uses both heuristics
 '''
 
 import numpy as np

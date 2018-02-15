@@ -2,6 +2,8 @@
 Created on Feb 6, 2018
 
 @author: dabrown
+
+uses only Manhattan distance heuristicf
 '''
 
 import numpy as np
