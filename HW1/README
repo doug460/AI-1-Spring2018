@@ -3,6 +3,8 @@ README
 Doug Brown
 2-15-18
 
+assuming python 2.7
+
 
 ----------- COMPILE ------------
 All files need to be in same folder
@@ -30,8 +32,6 @@ General expansion of node is moving empty space in the following order and addin
 ----------- BREADTH FIRST ------------
 To use, simply run the python code
 
-Inputs are defined in inputs.py 
-
 Output:
 	goal state and initial state
 	Then when a node is popped or added
@@ -50,7 +50,18 @@ Output:
 	
 	
 ----------- A* ------------
+uses both heuristics
+
 Output:
 	includes the cost associated with each node when it is added to the fringe 
+	
+	
+----------- A* 1 ------------
+Based on only the misplaced tiles heuristic
+
+----------- A* 2------------
+based on only the manhattan distance heuristic
+
+
 
 

@@ -20,7 +20,7 @@ expanded = 0
 
 
 # imports from breadthFirst search
-from breadthFirst import getString, testGoal, testHistory, expandNode
+from breadthFirst import getString, testGoal, testHistory, expandNode, NewNode
 
 
 
@@ -29,18 +29,18 @@ if __name__ == '__main__':
 
     print('DEPTH FIRST SEARCH')
 
-    print('Goal:   ', getString(goal))
+    print('Goal:    %s' % (getString(goal)))
     
     # state is the state that will be acted upon
     state = np.copy(initialState)
     
-    print('Init:   ', getString(initialState))
+    print('Init:    %s' % (getString(initialState)))
     
     
     # create a list of nodes with the initial node as the first element
     frontier = []
-    frontier.append(state)
-    print('added:  ', getString(state))
+    frontier.append(NewNode(state,None))
+    print('added:   %s' % (getString(state)))
     
     # history of nodes that have been in frontier
     history = []
@@ -51,13 +51,13 @@ if __name__ == '__main__':
         node = frontier.pop(-1)
         expanded += 1
         
-        print('popped: ', getString(node))
+        print('popped:  %s' %( getString(node.array)))
         
         # add node to history
-        history.append(node)
+        history.append(node.array)
         
         # test if success
-        if(testGoal(node)):
+        if(testGoal(node.array)):
             print('Reached successful node!')
             break;
         
@@ -66,9 +66,23 @@ if __name__ == '__main__':
 
     
     # print info
-    print('Number of nodes in fringe: ', len(frontier))
-    print('Number of nodes expanded: ', expanded)
+    print('Number of nodes in fringe: %d' % ( len(frontier)))
+    print('Number of nodes expanded: %d' % ( expanded))
 
+
+    # path to solve problem (reverse order)
+    path = []
+    path.append(node)
+
+    # get path
+    while(node.parent != None):
+        node = node.parent
+        path.append(node)
+
+    # print out path
+    print('\nThe solution path is:')
+    while(path):
+        print(getString(path.pop(-1).array))
 
 
 

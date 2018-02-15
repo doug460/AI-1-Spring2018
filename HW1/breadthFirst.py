@@ -67,7 +67,8 @@ def testHistory(node, history):
 #    updated history
 def expandNode(node, frontier, history):
     # get index of where the blank space is at
-    index = np.where(node=='*')[0][0]
+    array = node.array
+    index = np.where(array=='*')[0][0]
     
     # holds the node to be added to the list
     
@@ -75,77 +76,80 @@ def expandNode(node, frontier, history):
     # check above empty
     if(index - 3 >= 0):
         # switch positions
-        nextNode = np.copy(node)
-        nextNode[index] = node[index - 3]
+        nextNode = np.copy(array)
+        nextNode[index] = node.array[index - 3]
         nextNode[index - 3] = '*'
         
         # add to frontier if not already explored
         if(not testHistory(nextNode, history)):
-            frontier.append(nextNode)
+            frontier.append(NewNode(nextNode,node))
             history.append(nextNode)
-            print('added:  ', getString(nextNode))
+            print('added:   %s' % (getString(nextNode)))
         
     # check below empty
     if(index + 3 <= 8):
         # switch positions
-        nextNode = np.copy(node)
-        nextNode[index] = node[index + 3]
+        nextNode = np.copy(node.array)
+        nextNode[index] = node.array[index + 3]
         nextNode[index + 3] = '*'
         
         # add to frontier if not already explored
         if(not testHistory(nextNode, history)):
-            frontier.append(nextNode)
+            frontier.append(NewNode(nextNode,node))
             history.append(nextNode)
-            print('added:  ', getString(nextNode))
+            print('added:   %s' % (getString(nextNode)))
     
     # check left empty
     if(index != 0 and index != 3 and index != 6):
         # switch positions
-        nextNode = np.copy(node)
-        nextNode[index] = node[index - 1]
+        nextNode = np.copy(node.array)
+        nextNode[index] = node.array[index - 1]
         nextNode[index - 1] = '*'
         
         # add to frontier if not already explored
         if(not testHistory(nextNode, history)):
-            frontier.append(nextNode)
+            frontier.append(NewNode(nextNode,node))
             history.append(nextNode)
-            print('added:  ', getString(nextNode))
+            print('added:   %s' % (getString(nextNode)))
     
     # check right empty
     if(index != 2 and index != 5 and index != 8):
         # switch positions
-        nextNode = np.copy(node)
-        nextNode[index] = node[index + 1]
+        nextNode = np.copy(node.array)
+        nextNode[index] = node.array[index + 1]
         nextNode[index + 1] = '*'
         
         # add to frontier if not already explored
         if(not testHistory(nextNode, history)):
-            frontier.append(nextNode)
+            frontier.append(NewNode(nextNode,node))
             history.append(nextNode)
-            print('added:  ', getString(nextNode))
+            print('added:   %s' % (getString(nextNode)))
             
     return(frontier, history)
     
-    
-    
+class NewNode:
+    def __init__(self,array,parent):
+        self.array = array
+        self.parent = parent
+
 
 if __name__ == '__main__':
     pass
 
     print('BREADTH FIRST SEARCH')
     
-    print('Goal:   ', getString(goal))
+    print('Goal:    %s' % (getString(goal)))
     
     # state is the state that will be acted upon
     state = np.copy(initialState)
     
-    print('Init:   ', getString(initialState))
+    print('Init:    %s' % (getString(initialState)))
     
     
     # create a list of nodes with the initial node as the first element
     frontier = []
-    frontier.append(state)
-    print('added:  ', getString(state))
+    frontier.append(NewNode(state,None))
+    print('added:   %s' % (getString(state)))
     
     # history of nodes that have been in frontier
     history = []
@@ -156,13 +160,13 @@ if __name__ == '__main__':
         node = frontier.pop(0)
         expanded += 1
         
-        print('popped: ', getString(node))
+        print('popped:  %s' %( getString(node.array)))
         
         # add node to history
-        history.append(node)
+        history.append(node.array)
         
         # test if success
-        if(testGoal(node)):
+        if(testGoal(node.array)):
             print('Reached successful node!')
             break;
         
@@ -170,8 +174,22 @@ if __name__ == '__main__':
         frontier, history = expandNode(node, frontier, history)
     
     # print info
-    print('Number of nodes in fringe: ', len(frontier))
-    print('Number of nodes expanded: ', expanded)
+    print('Number of nodes in fringe: %d' % ( len(frontier)))
+    print('Number of nodes expanded: %d' % ( expanded))
+
+    # path to solve problem (reverse order)
+    path = []
+    path.append(node)
+
+    # get path
+    while(node.parent != None):
+        node = node.parent
+        path.append(node)
+
+    # print out path
+    print('\nThe solution path is:')
+    while(path):
+        print(getString(path.pop(-1).array))
     
     
     
