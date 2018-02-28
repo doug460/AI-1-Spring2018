@@ -13,14 +13,13 @@ The output are the nodes added to and popped from the frontier
 
 
 import numpy as np
-from inputs import goal, initialState
 
 # number of nodes expanded
 expanded = 0
 
 
 # imports from breadthFirst search
-from breadthFirst import getString, testGoal, testHistory, expandNode, NewNode
+from breadthFirst import getString, testGoal, testHistory, expandNode, NewNode, getInputs
 
 
 
@@ -28,22 +27,29 @@ if __name__ == '__main__':
     pass
 
     print('DEPTH FIRST SEARCH')
-
-    print('Goal:    %s' % (getString(goal)))
+    print('\nThe output array is the color associated with each state')
+    print('0 means no assigned color\n')
     
-    # state is the state that will be acted upon
-    state = np.copy(initialState)
+    # get inputs
+    statesNum, edgesNum, colorsNum, edges = getInputs()
     
-    print('Init:    %s' % (getString(initialState)))
+    # get colors for each state
+    # initially all are undecided
+    colors = np.zeros((statesNum), dtype = np.int32)
     
-    
-    # create a list of nodes with the initial node as the first element
+    # create a list of nodes
     frontier = []
-    frontier.append(NewNode(state,None))
-    print('added:   %s' % (getString(state)))
+    
+    # get node for first completely undecided system
+    initialState = NewNode(colors, None)
+    frontier.append(initialState)
+    print('Initial state is ', getString(colors))
     
     # history of nodes that have been in frontier
     history = []
+    
+    # keep track if program was successful 
+    success = False
     
     # loop through the frontier
     while(frontier):
@@ -59,30 +65,25 @@ if __name__ == '__main__':
         # test if success
         if(testGoal(node.array)):
             print('Reached successful node!')
+            success = True
             break;
         
         # expand node 
-        frontier, history = expandNode(node, frontier, history)
+        frontier, history = expandNode(node, frontier, history, colorsNum, edges)
 
     
-    # print info
-    print('Number of nodes in fringe: %d' % ( len(frontier)))
-    print('Number of nodes expanded: %d' % ( expanded))
-
-
-    # path to solve problem (reverse order)
-    path = []
-    path.append(node)
-
-    # get path
-    while(node.parent != None):
-        node = node.parent
-        path.append(node)
-
-    # print out path
-    print('\nThe solution path is:')
-    while(path):
-        print(getString(path.pop(-1).array))
+    # whether or not the problem was solvable
+    if(success):
+        # print info
+        print('Number of nodes in fringe: %d' % ( len(frontier)))
+        print('Number of nodes expanded: %d' % ( expanded))
+    
+        # successful orientation is 
+        print('\nSuccessful orientation is: %s' % (getString(node.array)))
+    else:
+        # was not successful
+        print('Was not able to find a solution')
+        print('Problem is not solvable!')
 
 
 

@@ -10,16 +10,25 @@ the goal and the initial state
 '''
 
 import numpy as np
-from inputs import goal, initialState
+import fileinput
 
-# define inputs file name
-fileIn = 'inputs.txt'
+
+# get input file from user
+fileIn = fileinput.input()
+# need to read one line to get name of file
+trash = next(fileIn)
+fileName = fileIn.filename()
+fileIn.close()
+
 
 # number of nodes expanded
 expanded = 0
 
 # is value of no color
 noColor = 0
+
+# keep track of nodes in layer
+nextLayer_nodes = 0
 
 
 # this function turns the character array into an easily printed string
@@ -99,14 +108,14 @@ def passConstraint(array, edges):
 # output:
 #    updated frontier
 #    updated history
-#    nodeCreated: boolean for if a node was created
 def expandNode(node, frontier, history, colorsNum, edges):
     # get index of where the blank space is at
     array = node.array
     nextArray = np.copy(array)
     
-    # keep track if a new node was created
-    nodeCreated = False
+    # keep track of nodes in layer
+    global nextLayer_nodes
+    
     
     # check if there is an unassigned color in array
     if(noColor in array):
@@ -123,12 +132,10 @@ def expandNode(node, frontier, history, colorsNum, edges):
                     frontier.append(NewNode(nextArray, node))
                     history.append(nextArray)
                     print('added:   %s' % (getString(nextArray)))
-                    
-                    # a node was created
-                    nodeCreated = True
+                    nextLayer_nodes += 1
                  
             
-    return(frontier, history, nodeCreated)
+    return(frontier, history)
     
 #******#
 # this is a node class
@@ -140,13 +147,13 @@ class NewNode:
 #******#
 # Get inputs is for importing information about color map
 # input:
-#     fileName: string to text file
+#     None
 # output:
 #     nodesNum: number of nodes
 #     edgesNum: number of edges
 #     colorsNum: number of colors
 #     edges:     the edges
-def getInputs(fileName):
+def getInputs():
     # edges is array to hold the edges in the graph
     edges = []
     
@@ -162,15 +169,17 @@ def getInputs(fileName):
     
     # return info
     return(statesNum, edgesNum, colorsNum, edges)
+    
 
 if __name__ == '__main__':
     pass
 
-    print('BREADTH FIRST SEARCH')
-    
+    print('BREADTH FIRST SEARCH')   
+    print('\nThe output array is the color associated with each state')
+    print('0 means no assigned color\n')
     
     # get inputs
-    statesNum, edgesNum, colorsNum, edges = getInputs(fileIn)
+    statesNum, edgesNum, colorsNum, edges = getInputs()
     
     # get colors for each state
     # initially all are undecided
@@ -208,7 +217,7 @@ if __name__ == '__main__':
             break;
         
         # expand node 
-        frontier, history, nodeCreated = expandNode(node, frontier, history, colorsNum, edges)
+        frontier, history = expandNode(node, frontier, history, colorsNum, edges)
         
     # whether or not the problem was solvable
     if(success):
