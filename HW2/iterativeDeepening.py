@@ -14,7 +14,7 @@ currentLayer_nodes = 0
 nextLayer_nodes = 0
 
 # imports from breadthFirst search
-from breadthFirst import getString, testGoal, testHistory, NewNode, expandNode
+from breadthFirst import getString, testGoal, testHistory, NewNode, expandNode, getInputs
 
 
 
@@ -37,9 +37,15 @@ if __name__ == '__main__':
     # this iteratively increases
     depthLimit = 0
     
+    # success in depth
     success = False
     
+    # how many nodes were expanded previously
+    expandedNodes_prev = 0
+    
+    
     # infinite loop for deepening
+    # as long as new nodes are indeed created
     while(not success):
         # reset current depth
         depthLeft = depthLimit
@@ -53,10 +59,13 @@ if __name__ == '__main__':
         # history of nodes that have been in frontier
         history = []
         
+        # keep track of the number of nodes that were expanded
+        expandedNodes = expanded
+        
         # loop through the frontier
         while(frontier):
             # pop out first node
-            node = frontier.pop(0)
+            node = frontier.pop(-1)
             expanded += 1
             currentLayer_nodes -= 1
             
@@ -73,7 +82,7 @@ if __name__ == '__main__':
             
             # expand node 
             if(depthLeft > 0):
-                frontier, history = expandNode(node, frontier, history)
+                frontier, history = expandNode(node, frontier, history, colorsNum, edges)
                 
             # check when reached in of layer
             # update current and next layer nodes
@@ -82,34 +91,45 @@ if __name__ == '__main__':
                 nextLayer_nodes = 0
                 depthLeft -= 1
                 
-                print('-- Finished this layer --')
-            
+        print('-- Finished this layer --')
+        
+        # increase depth    
         depthLimit += 1
         
+        # how many nodes were created this round
+        expandedNodes = expanded - expandedNodes
+        
+        # if there is not a difference between previously expanded nodes and current expanded nodes
+        # than increasing the depth did not help and should terminate
+        if(expandedNodes == expandedNodes_prev and not success):
+            print('\nIncreasing depth did not help... terminating program')
+            break;
+        else:
+            expandedNodes_prev = expandedNodes
+        
+    
+    # whether or not the problem was solvable
+    if(success):
         # print info
         print('Number of nodes in fringe: %d' % ( len(frontier)))
         print('Number of nodes expanded: %d' % ( expanded))
-        
-        if(not success):
-            print('\n -- Depth increased to %d -- \n\n' % (depthLimit))
-
-
-    print('\nFinished iterative deepening search!!')
     
-    # path to solve problem (reverse order)
-    path = []
-    path.append(node)
-
-    # get path
-    while(node.parent != None):
-        node = node.parent
-        path.append(node)
-
-    # print out path
-    print('\nThe solution path is:')
-    while(path):
-        print(getString(path.pop(-1).array))
-
+        # successful orientation is 
+        print('\nSuccessful orientation is: %s' % (getString(node.array)))
+        
+        print('\nState: color')
+        for state, color in enumerate(node.array):
+            print('%d: %d' % (state + 1, color))
+    else:
+        # was not successful
+        print('Was not able to find a solution')
+        print('Problem is not solvable!')
+        
+        # print info
+        print('Number of nodes in fringe: %d' % ( len(frontier)))
+        print('Number of nodes expanded: %d' % (expanded))
+            
+    
 
 
 

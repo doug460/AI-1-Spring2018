@@ -7,152 +7,74 @@ uses both heuristics
 '''
 
 import numpy as np
-from inputs import goal, initialState
 
 # imports from breadthFirst search
-from breadthFirst import getString, testGoal, testHistory, NewNode
+from breadthFirst import getString, testGoal, testHistory, NewNode, getInputs, noColor, passConstraint, nextLayer_nodes
 
 # number of nodes expanded
 expanded = 0
 
-
-
-# heuristic for misplaced tiles
-# input:
-#     the array to compare with the goal
-# output:
-#     number of misplaced tiles
-def misplaced(array):
-    return len(goal) - np.sum(array == goal)
-
-# heuristic for Manhattan distance
-# input:
-#     array for getting Manhattan distance 
-# output:
-#     sum of distances
-def manhat(array):
-    # total distance of moves
-    totalDistance = 0
-    
-    # loop through each element
-    for indx, element in enumerate(array):
-        # distance for each element
-        distance = 0
-        
-        # dont count * as a tile
-        if(element != '*'):
-            # get which layer element is in 
-            if(indx == 0 or indx == 1 or indx == 2):
-                layer = 0
-            elif(indx == 3 or indx == 4 or indx == 5):
-                layer = 1
-            else:
-                layer = 2
-        
-            # get the goal layer for element
-            goalIndx = np.where(goal==element)[0][0]
-            
-            # get which layer goal is  
-            if(goalIndx == 0 or goalIndx == 1 or goalIndx == 2):
-                goalLayer = 0
-            elif(goalIndx == 3 or goalIndx == 4 or goalIndx == 5):
-                goalLayer = 1
-            else:
-                goalLayer = 2
-                
-            # while they layers are not the same, move element
-            while(layer != goalLayer):
-                # shift up or down to get to correct layer and count moves
-                if(layer > goalLayer):
-                    indx -= 3
-                    layer -= 1
-                    distance += 1
-                else:
-                    indx += 3
-                    layer += 1
-                    distance += 1
-                    
-            # now on correct layer, get remaining moves
-            distance += abs(indx - goalIndx)
-            
-            # update total distance
-            totalDistance += distance
-    
-    return totalDistance
-
-# quickly get the cost
+#********#
+# input is the current color array
+# the heuristic is simply want to use repeated colors
+# INPUT:
+#    array- just the current array of colors
+# OUTPUT:
+#     repeated- the number of times a color is repeated
 def getCost(array):
-    return(manhat(array) + misplaced(array))
+    # count time a color is repeated
+    repeated = 0
+    for element in array:
+        # exclude counted zeros
+        if(element != 0):
+            counted = (array == element).sum()
+            # keep track of max
+            if(counted > repeated):
+                repeated = counted
+    
+    return -repeated
 
 
+#******#
 # expand a node excluding previous states
 # input:
-#     node array
+#     node 
 #     frontier list
 #     history of expanded nodes list
+#     colorsNum
+#     edges
 # output:
 #    updated frontier
 #    updated history
-def expandNode(node, frontier, history):
+def expandNode(node, frontier, history, colorsNum, edges):
     # get index of where the blank space is at
-    index = np.where(node.array=='*')[0][0]
+    array = node.array
+    nextArray = np.copy(array)
     
-    # holds the node to be added to the list
+    # keep track of nodes in layer
+    global nextLayer_nodes
     
     
-    # check above empty
-    if(index - 3 >= 0):
-        # switch positions
-        nextNode = np.copy(node.array)
-        nextNode[index] = node.array[index - 3]
-        nextNode[index - 3] = '*'
-        
-        # add to frontier if not already explored
-        if(not testHistory(nextNode, history)):
-            frontier.append(NewNode(nextNode,node))
-            history.append(nextNode)
-            print('added:   %s cost: %d' % (getString(nextNode), getCost(nextNode)))
-        
-    # check below empty
-    if(index + 3 <= 8):
-        # switch positions
-        nextNode = np.copy(node.array)
-        nextNode[index] = node.array[index + 3]
-        nextNode[index + 3] = '*'
-        
-        # add to frontier if not already explored
-        if(not testHistory(nextNode, history)):
-            frontier.append(NewNode(nextNode,node))
-            history.append(nextNode)
-            print('added:   %s cost: %d' % (getString(nextNode), getCost(nextNode)))
-    
-    # check left empty
-    if(index != 0 and index != 3 and index != 6):
-        # switch positions
-        nextNode = np.copy(node.array)
-        nextNode[index] = node.array[index - 1]
-        nextNode[index - 1] = '*'
-        
-        # add to frontier if not already explored
-        if(not testHistory(nextNode, history)):
-            frontier.append(NewNode(nextNode,node))
-            history.append(nextNode)
-            print('added:   %s cost: %d' % (getString(nextNode), getCost(nextNode)))
-    
-    # check right empty
-    if(index != 2 and index != 5 and index != 8):
-        # switch positions
-        nextNode = np.copy(node.array)
-        nextNode[index] = node.array[index + 1]
-        nextNode[index + 1] = '*'
-        
-        # add to frontier if not already explored
-        if(not testHistory(nextNode, history)):
-            frontier.append(NewNode(nextNode,node))
-            history.append(nextNode)
-            print('added:   %s cost: %d' % (getString(nextNode), getCost(nextNode)))
+    # check if there is an unassigned color in array
+    if(noColor in array):
+        # get state index where the zero is at
+        state = np.where(array == noColor)[0][0]          
+        # step through and add colors
+        for color in range(colorsNum + 1):
+            nextArray = np.copy(array)
+            nextArray[state] = color
+            # if node doesn't exist in history
+            if(not testHistory(nextArray, history)):
+                # if new allowed color
+                if(passConstraint(nextArray, edges)):
+                    frontier.append(NewNode(nextArray, node))
+                    history.append(nextArray)
+                    print('added:   %s with cost %d' % (getString(nextArray), getCost(nextArray)))
+                    nextLayer_nodes += 1
+                 
             
     return(frontier, history)
+
 
 # gets the index of the node that is the most optimal to be popped
 # input:
@@ -185,21 +107,29 @@ if __name__ == '__main__':
 
     print('A* SEARCH')
     
-    print('Goal:    %s' % (getString(goal)))
+    print('\nThe output array is the color associated with each state')
+    print('0 means no assigned color\n')
     
-    # state is the state that will be acted upon
-    state = np.copy(initialState)
+    # get inputs
+    statesNum, edgesNum, colorsNum, edges = getInputs()
     
-    print('Init:    %s' % (getString(initialState)))
+    # get colors for each state
+    # initially all are undecided
+    colors = np.zeros((statesNum), dtype = np.int32)
     
-    
-    # create a list of nodes with the initial node as the first element
+    # create a list of nodes
     frontier = []
-    frontier.append(NewNode(state,None))
-    print('added:   %s cost: %d' % (getString(state), getCost(state)))
+    
+    # get node for first completely undecided system
+    initialState = NewNode(colors, None)
+    frontier.append(initialState)
+    print('Initial state is ', getString(colors))
     
     # history of nodes that have been in frontier
     history = []
+    
+    # keep track of success
+    success = False
     
     # loop through the frontier
     while(frontier):
@@ -218,28 +148,32 @@ if __name__ == '__main__':
         # test if success
         if(testGoal(node.array)):
             print('Reached successful node!')
+            success = True
             break;
         
         # expand node 
-        frontier, history = expandNode(node, frontier, history)
+        frontier, history = expandNode(node, frontier, history, colorsNum, edges)
     
-    # print info
-    print('Number of nodes in fringe: %d' % ( len(frontier)))
-    print('Number of nodes expanded: %d' % ( expanded))
+    # whether or not the problem was solvable
+    if(success):
+        # print info
+        print('Number of nodes in fringe: %d' % ( len(frontier)))
+        print('Number of nodes expanded: %d' % ( expanded))
     
-    # path to solve problem (reverse order)
-    path = []
-    path.append(node)
-
-    # get path
-    while(node.parent != None):
-        node = node.parent
-        path.append(node)
-
-    # print out path
-    print('\nThe solution path is:')
-    while(path):
-        print(getString(path.pop(-1).array))
+        # successful orientation is 
+        print('\nSuccessful orientation is: %s' % (getString(node.array)))
+        
+        print('\nState: color')
+        for state, color in enumerate(node.array):
+            print('%d: %d' % (state + 1, color))
+    else:
+        # was not successful
+        print('Was not able to find a solution')
+        print('Problem is not solvable!')
+        
+        # print info
+        print('Number of nodes in fringe: %d' % ( len(frontier)))
+        print('Number of nodes expanded: %d' % (expanded))
     
 
 

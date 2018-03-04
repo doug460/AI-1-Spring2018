@@ -43,7 +43,7 @@ def getString(array):
     # get the character and index in the array
     for value in array:
         # append to string holder
-        temp = '%d' % (value)
+        temp = '%d.' % (value)
         string += temp
     
     return string
@@ -55,10 +55,7 @@ def getString(array):
 # Output:
 #    boolean
 def testGoal(array):
-    if noColor in array:
-        return False
-    else:
-        return True
+    return(not (noColor in array))
 
 # test history
 # if node exists in history, return true
@@ -122,7 +119,7 @@ def expandNode(node, frontier, history, colorsNum, edges):
         # get state index where the zero is at
         state = np.where(array == noColor)[0][0]          
         # step through and add colors
-        for color in range(colorsNum + 1):
+        for color in range(1,colorsNum + 1):
             nextArray = np.copy(array)
             nextArray[state] = color
             # if node doesn't exist in history
@@ -227,6 +224,10 @@ if __name__ == '__main__':
     
         # successful orientation is 
         print('\nSuccessful orientation is: %s' % (getString(node.array)))
+        
+        print('\nState: color')
+        for state, color in enumerate(node.array):
+            print('%d: %d' % (state + 1, color))
     else:
         # was not successful
         print('Was not able to find a solution')

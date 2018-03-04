@@ -80,6 +80,10 @@ if __name__ == '__main__':
     
         # successful orientation is 
         print('\nSuccessful orientation is: %s' % (getString(node.array)))
+        
+        print('\nState: color')
+        for state, color in enumerate(node.array):
+            print('%d: %d' % (state + 1, color))
     else:
         # was not successful
         print('Was not able to find a solution')
