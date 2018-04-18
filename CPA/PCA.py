@@ -8,6 +8,7 @@ import pandas as pd
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 
 
@@ -148,7 +149,184 @@ def getTerror(country, data):
         raise Exception(string)
     
     return data[indx][0,1]
+
+def getEdu(country, data):
+    # get terrorism indx
+    # country, value, date
+    if country == 'United States of America':
+        country = 'United States'
+    elif country == 'Viet Nam':
+        country = 'Vietnam'
+    elif country == 'DR Congo':
+        country = 'Democratic Republic of the Congo'
+    elif country == 'U.K.':
+        country = 'United Kingdom'
+    elif country == 'Myanmar':
+        country = 'Burma'
+        
     
+        
+    
+    # get indx of all of country values
+    indx = data[:,0] == country
+
+    # check if country exists
+    if sum(indx) == 0:
+        return None
+    
+    return data[indx][0,1]
+
+def getEduExpense(country, data):
+    # get terrorism indx
+    # country, value, date
+    if country == 'United States of America':
+        country = 'United States'
+    elif country == 'Viet Nam':
+        country = 'Vietnam'
+    elif country == 'DR Congo':
+        country = 'Congo, Republic of the'
+    elif country == 'U.K.':
+        country = 'United Kingdom'
+    elif country == 'Myanmar':
+        country = 'Burma'
+    elif country == 'Nigeria':
+        return 14.84
+    elif country == 'Egypt':
+        return 11
+    elif country == 'Iraq':
+        return 6.43
+    elif country == 'Afghanistan':
+        return 12.51
+        
+        
+    
+        
+    
+    # get indx of all of country values
+    indx = data[:,0] == country
+
+    # check if country exists
+    if sum(indx) == 0:
+        return None
+    
+    string = data[indx][0,1]
+    string = string.replace('%','')
+    return float(string)
+
+def getBirth(country, data):
+    # get terrorism indx
+    # country, value, date
+    if country == 'United States of America':
+        country = 'United States'
+    elif country == 'Viet Nam':
+        country = 'Vietnam'
+    elif country == 'DR Congo':
+        country = 'Congo, Republic of the'
+    elif country == 'U.K.':
+        country = 'United Kingdom'
+    elif country == 'Myanmar':
+        country = 'Burma'
+        
+    # get indx of all of country values
+    indx = data[:,0] == country
+
+    # check if country exists
+    if sum(indx) == 0:
+        return None
+    
+    string = data[indx][0,1].replace(' per 1,000 people','')
+
+    return float(string)
+
+def getPoverty(country, data):
+    # get terrorism indx
+    # country, value, date
+    if country == 'United States of America':
+        country = 'United States'
+    elif country == 'Viet Nam':
+        country = 'Vietnam'
+    elif country == 'DR Congo':
+        country = 'Democratic Republic of the Congo'
+    elif country == 'U.K.':
+        country = 'United Kingdom'
+    elif country == 'Myanmar':
+        country = 'Burma'
+    elif country == 'Italy':
+        return 7.51
+        
+    # get indx of all of country values
+    indx = data[:,0] == country
+
+    # check if country exists
+    if sum(indx) == 0:
+        return None
+    
+    string = data[indx][0,1].replace('%\n per 1 million people','')
+
+    return float(string)
+
+def getArmed(country, data):
+    # get terrorism indx
+    # country, value, date
+    if country == 'United States of America':
+        country = 'United States'
+    elif country == 'Viet Nam':
+        country = 'Vietnam'
+    elif country == 'DR Congo':
+        country = 'Democratic Republic of the Congo'
+    elif country == 'U.K.':
+        country = 'United Kingdom'
+    elif country == 'Myanmar':
+        country = 'Burma'
+    elif country == 'Tanzania':
+        return 0.728
+    elif country == 'Iraq':
+        return 8.71
+    elif country == 'Afghanistan':
+        return 0.902
+    
+    # get indx of all of country values
+    indx = data[:,0] == country
+
+    # check if country exists
+    if sum(indx) == 0:
+        return None
+
+    return data[indx][0,1]
+
+def getMilitaryExpense(country, data):
+    # get terrorism indx
+    # country, value, date
+    if country == 'United States of America':
+        country = 'United States'
+    elif country == 'Viet Nam':
+        country = 'Vietnam'
+    elif country == 'DR Congo':
+        country = 'Democratic Republic of the Congo'
+    elif country == 'U.K.':
+        country = 'United Kingdom'
+    elif country == 'Myanmar':
+        country = 'Burma'
+    elif country == 'Egypt':
+        return 1.6673
+    elif country == 'Iran':
+        return 3.0
+    elif country == 'South Korea':
+        return 2.6
+        
+    
+    # get indx of all of country values
+    indx = data[:,0] == country
+
+    # check if country exists
+    if sum(indx) == 0:
+        return None
+    
+    stuff = data[indx][0,1].replace('%','')
+    stuff = float(stuff)
+
+    return stuff
+
 def normData(data):
     # basically just zero mean unit variance data
     # INPUTS: is array of data set
@@ -161,6 +339,8 @@ def normData(data):
 
 if __name__ == '__main__':
     pass
+    # dir to save stuff
+    dir = '/home/dabrown/Dropbox/Current/School 2018 Spring/CPA/project/figs_info/'
 
     # get to data dir
     os.chdir('excel')
@@ -191,9 +371,26 @@ if __name__ == '__main__':
     #~~~~~~~~~~~~~~~~~~ terror indx ~~~~~~~~~~~~~~#
     terrorIndx_base = pd.read_csv('terrorIndx.csv').as_matrix()
     
+    #~~~~~~~~~~~~~~~~~~ years of edu ~~~~~~~~~~~~~~#
+    eduBase = pd.read_csv('educationAmount.csv').as_matrix()
+    
+    #~~~~~~~~~~~~~~~~~~ % money on edu ~~~~~~~~~~~~~~#
+    eduExp_base = pd.read_csv('educationExpense.csv').as_matrix()
+    
+    #~~~~~~~~~~~~~~~~~~ % birth rate / 1000 ~~~~~~~~~~~~~~#
+    birth_base = pd.read_csv('birth.csv').as_matrix()
+    
+    #~~~~~~~~~~~~~~~~~~ % % below poverty line/ 1M peeps ~~~~~~~~~~~~~~#
+    poverty_base = pd.read_csv('poverty.csv').as_matrix()
+    
+    #~~~~~~~~~~~~~~~~~~ % armed forces / 1000 ~~~~~~~~~~~~~~#
+    armed_base = pd.read_csv('armedForces.csv').as_matrix()
+    
+    #~~~~~~~~~~~~~~~~~~ % military expense % of GDP ~~~~~~~~~~~~~~#
+    miliaryExpense_base = pd.read_csv('militaryExpense.csv').as_matrix()
     
     # combined matrix of all data
-    varNum = 4
+    varNum = 10
     data = np.zeros((varNum, dataLeng))
     
     # list of countries :P
@@ -203,6 +400,21 @@ if __name__ == '__main__':
         data[1,indx] = getDisposable(country, incomeBase)
         data[2,indx] = getInfant_mort(country, infantMort_base)
         data[3,indx] = getTerror(country, terrorIndx_base)
+        data[4,indx] = getEdu(country, eduBase)
+        data[5,indx] = getEduExpense(country, eduExp_base)
+        data[6,indx] = getBirth(country, birth_base)
+        data[7,indx] = getPoverty(country, poverty_base)
+        data[8,indx] = getArmed(country, armed_base)
+        data[9,indx] = getMilitaryExpense(country, miliaryExpense_base)
+        
+    # check most recent data set
+    # if there is missing, throw error
+    indx = np.isnan(data[varNum - 1,:])
+    if(sum(indx) > 0):
+        print('These countries do not exists in recent data set')
+        print(countrys[indx])
+        raise Exception('country DNE in data')
+    
     
     # normalize data
     # zero mean unit variance
@@ -243,6 +455,7 @@ if __name__ == '__main__':
         plt.legend(loc='best')
         plt.title('Explained Variance')
         plt.tight_layout()
+        plt.savefig(dir + 'cumulitive_sum.png')
         
         
         
@@ -262,15 +475,50 @@ if __name__ == '__main__':
         for indx, country in enumerate(countrys):
             plt.annotate(country, (dataProject[indx,0], dataProject[indx,1]))
         plt.tight_layout()
-
-    
-    print('Principal component 1: ', eigVect[:,0])
-    print('Principal component 2: ', eigVect[:,1])
+        plt.savefig(dir + 'countries.png')
     
     
+    # output z stuff!!
+    out = open(dir + 'info.txt', 'w')
+    string = 'PCs (%variance explained) are:\n'
+    for indx, array in enumerate(eigVect):
+        string += '%2d (%%%5.2f): [' % (indx, varExplained[indx])
+        for value in array:
+            string += '%7.4f, ' % (value)
+        string += ']\n'
+    
+    print(string)
+    out.write(string)
+        
+    out.close()
+        
     
     # show stuff
-#     plt.show()
+    #plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     
     
