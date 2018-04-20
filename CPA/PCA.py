@@ -9,7 +9,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-
+import seaborn as sns
+import matplotlib
 
 
 def getHomicide_rate(country, data):
@@ -327,6 +328,41 @@ def getMilitaryExpense(country, data):
 
     return stuff
 
+def getEmploy(country, data):
+    # get terrorism indx
+    # country, value, date
+    if country == 'Viet Nam':
+        country = 'Vietnam'
+    elif country == 'U.K.':
+        country = 'United Kingdom'
+    elif country == 'China':
+        return 4
+    elif country == 'South Korea':
+        country = 'Korea Rep'
+    elif country == 'Nigeria':
+        return 14
+    elif country == 'Russia':
+        return 5.3
+    elif country == 'DR Congo':
+        return 46
+    elif country == 'Kenya':
+        return 11
+    elif country == 'Sudan':
+        return 13.3
+        
+    
+    # get indx of all of country values
+    indx = data[:,0] == country
+
+    # check if country exists
+    if sum(indx) == 0:
+        return None
+    
+    stuff = data[indx][0,5]
+    stuff = float(stuff)
+
+    return stuff
+
 def normData(data):
     # basically just zero mean unit variance data
     # INPUTS: is array of data set
@@ -389,9 +425,18 @@ if __name__ == '__main__':
     #~~~~~~~~~~~~~~~~~~ % military expense % of GDP ~~~~~~~~~~~~~~#
     miliaryExpense_base = pd.read_csv('militaryExpense.csv').as_matrix()
     
+    #~~~~~~~~~~~~~~~~~~ % employmnet Rate ~~~~~~~~~~~~~~#
+    employ_base = pd.read_csv('unemployment.csv').as_matrix()
+    
     # combined matrix of all data
-    varNum = 10
+    varNum = 11
     data = np.zeros((varNum, dataLeng))
+    
+    # list of labels
+    labels = ['Homicide','Disposable $','Infant Mortality','Terrorism','Education Years','Education $','Birth Rate','Poverty',
+              'Armed Forces','Military $', 'Unemployment %']
+    labelsShort = ['Hom','+$', 'Inf Mort', 'Terr', 'Edu', 'Edu $', 'Birth', '-$', 'Armed', 'Milit $',
+                   'unemploy']
     
     # list of countries :P
     for indx, country in enumerate(countrys):
@@ -406,6 +451,7 @@ if __name__ == '__main__':
         data[7,indx] = getPoverty(country, poverty_base)
         data[8,indx] = getArmed(country, armed_base)
         data[9,indx] = getMilitaryExpense(country, miliaryExpense_base)
+        data[10,indx] = getEmploy(country, employ_base)
         
     # check most recent data set
     # if there is missing, throw error
@@ -424,6 +470,17 @@ if __name__ == '__main__':
     # get covariance matrix
     # becomes varNum x varNum
     cov = np.cov(data)
+    
+    # Compute the correlation matrix
+    corr = cov
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ax.matshow(corr)
+    plt.xticks(range(len(labelsShort)), labelsShort);
+    plt.yticks(range(len(labels)), labels);
+    plt.title('Correlation Matrix', fontsize = 15)
+    plt.savefig(dir + 'correlation.png')
+    
+    
     
     # get eignvalues and vectors
     eigVal, eigVect = np.linalg.eig(cov)
@@ -453,7 +510,7 @@ if __name__ == '__main__':
         plt.ylabel('Explained variance ratio')
         plt.xlabel('Principal components')
         plt.legend(loc='best')
-        plt.title('Explained Variance')
+        plt.title('Explained Variance',fontsize = 15)
         plt.tight_layout()
         plt.savefig(dir + 'cumulitive_sum.png')
         
@@ -471,11 +528,34 @@ if __name__ == '__main__':
         plt.xlabel('Principal Component 1')
         plt.ylabel('Principal Component 2')
         plt.legend(loc='lower center')
-        plt.title('%d%% of Variance' % (cumsum[1]))
+        plt.title('%d%% of Variance' % (cumsum[1]),fontsize = 15)
         for indx, country in enumerate(countrys):
             plt.annotate(country, (dataProject[indx,0], dataProject[indx,1]))
         plt.tight_layout()
         plt.savefig(dir + 'countries.png')
+        
+    # create plot of PC 1,2
+    plt.figure()
+    plt.stem(eigVect[0,:])
+    plt.title('Principal Component 1',fontsize = 15)
+    for indx, value in enumerate(eigVect[0,:]):
+        plt.annotate(labels[indx], xy = (indx,value))
+    plt.savefig(dir + 'pc1.png')
+        
+    plt.figure()
+    plt.stem(eigVect[1,:])
+    plt.title('Principal Component 2',fontsize = 15)
+    for indx, value in enumerate(eigVect[1,:]):
+        plt.annotate(labels[indx], xy = (indx,value))
+    plt.savefig(dir + 'pc2.png')
+    
+    plt.figure()
+    plt.stem(eigVect[2,:])
+    plt.title('Principal Component 3',fontsize = 15)
+    for indx, value in enumerate(eigVect[2,:]):
+        plt.annotate(labels[indx], xy = (indx,value))
+    plt.savefig(dir + 'pc3.png')
+    
     
     
     # output z stuff!!
@@ -491,7 +571,6 @@ if __name__ == '__main__':
     out.write(string)
         
     out.close()
-        
     
     # show stuff
     #plt.show()
