@@ -14,10 +14,10 @@ def loop():
 if __name__ == '__main__':
     pass
 
-    print(loop())
+    list = ['here', 'five', 3, 'hi']
+    list2 = [1,3, 4, 3]
     
-    test = []
-    if test:
-        print('here')
-        
+    indx = list2.index(3)
+    print(indx)
+    print(list[indx])
     
