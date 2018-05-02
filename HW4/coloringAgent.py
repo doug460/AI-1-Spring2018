@@ -8,7 +8,6 @@ main program to run the searching algorithm to solve the coloring graph
 
 import numpy as np
 import fileinput
-from scipy.stats.stats import tiecorrect
 
 
 # get input file from user
